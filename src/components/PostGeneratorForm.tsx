@@ -26,6 +26,7 @@ export const PostGeneratorForm = ({ onSubmit, isLoading }: PostGeneratorFormProp
   const [postTone, setPostTone] = useState<PostTone>(PostTone.FRIENDLY);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [additionalInfo, setAdditionalInfo] = useState("");
+  const [customerName, setCustomerName] = useState("");
 
   const toggleProduct = (productName: string) => {
     setSelectedProducts(prev =>
@@ -40,10 +41,16 @@ export const PostGeneratorForm = ({ onSubmit, isLoading }: PostGeneratorFormProp
     onSubmit({ postType, postTone, products: selectedProducts, additionalInfo });
   };
 
+  const getProductDisplay = () => {
+    if (selectedProducts.length === 0) return "ထုတ်ကုန်များ ရွေးချယ်ပါ";
+    if (selectedProducts.length === 1) return selectedProducts[0];
+    return `${selectedProducts.length} ထုတ်ကုန်များ ရွေးချယ်ထားသည်`;
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 font-myanmar">
       <div className="space-y-2">
-        <Label className="text-sm sm:text-base font-semibold">📝 Choose Your Vibe</Label>
+        <Label className="text-sm sm:text-base font-semibold">📝 ပို့စ်အမျိုးအစား ရွေးချယ်ပါ</Label>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -72,7 +79,7 @@ export const PostGeneratorForm = ({ onSubmit, isLoading }: PostGeneratorFormProp
       </div>
 
       <div className="space-y-2">
-        <Label className="text-sm sm:text-base font-semibold">🎭 Set the Mood</Label>
+        <Label className="text-sm sm:text-base font-semibold">🎭 စာရေးပုံစံ ရွေးချယ်ပါ</Label>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -102,35 +109,69 @@ export const PostGeneratorForm = ({ onSubmit, isLoading }: PostGeneratorFormProp
 
       <div className="space-y-2">
         <Label className="text-sm sm:text-base font-semibold">
-          🛍️ Pick Your Products <span className="text-primary">({selectedProducts.length})</span>
+          🛍️ ထုတ်ကုန်များ ရွေးချယ်ပါ <span className="text-primary">({selectedProducts.length})</span>
         </Label>
-        <div className="grid grid-cols-2 gap-2">
-          {PRODUCTS.map((product) => (
-            <button
-              key={product.name}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
               type="button"
-              onClick={() => toggleProduct(product.name)}
-              className={`p-2.5 sm:p-3 rounded-xl text-xs sm:text-sm font-medium text-left transition-all touch-manipulation ${
-                selectedProducts.includes(product.name)
-                  ? "bg-accent text-accent-foreground shadow-md scale-95"
-                  : "bg-card text-card-foreground border border-border hover:border-primary/50 active:scale-95"
-              }`}
+              variant="outline"
+              className="w-full justify-between text-left font-medium h-auto py-3 px-4"
             >
-              {product.name}
-            </button>
-          ))}
-        </div>
+              <span className="truncate">{getProductDisplay()}</span>
+              <ChevronDown className="h-4 w-4 ml-2 flex-shrink-0 opacity-50" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[300px] overflow-y-auto bg-background z-50">
+            {PRODUCTS.map((product) => (
+              <DropdownMenuItem
+                key={product.name}
+                onClick={() => toggleProduct(product.name)}
+                className={`cursor-pointer ${
+                  selectedProducts.includes(product.name) ? "bg-accent text-accent-foreground" : ""
+                }`}
+              >
+                <div className="flex items-center w-full">
+                  <div className={`w-4 h-4 mr-2 rounded border flex-shrink-0 flex items-center justify-center ${
+                    selectedProducts.includes(product.name) ? "bg-primary border-primary" : "border-border"
+                  }`}>
+                    {selectedProducts.includes(product.name) && (
+                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                  <span>{product.name}</span>
+                </div>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="customer-name" className="text-sm sm:text-base font-semibold">
+          👤 အမည်
+        </Label>
+        <input
+          id="customer-name"
+          type="text"
+          value={customerName}
+          onChange={(e) => setCustomerName(e.target.value)}
+          placeholder="သင့်အမည် ထည့်ပါ"
+          className="w-full px-3 py-2 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+        />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="additional-info" className="text-sm sm:text-base font-semibold">
-          💭 Extra Magic (Optional)
+          💭 နောက်ထပ် အချက်အလက်များ (ရွေးချယ်ရန်)
         </Label>
         <Textarea
           id="additional-info"
           value={additionalInfo}
           onChange={(e) => setAdditionalInfo(e.target.value)}
-          placeholder="Any special details? Promotions? Secret sauce? Share it here..."
+          placeholder="အထူးအချက်အလက်များ၊ ပရိုမိုးရှင်းများ၊ သီးခြားအချက်အလက်များ ရှိပါက ဤနေရာတွင် ရေးပါ..."
           className="min-h-[80px] sm:min-h-[100px] resize-none text-sm"
         />
       </div>
@@ -143,12 +184,12 @@ export const PostGeneratorForm = ({ onSubmit, isLoading }: PostGeneratorFormProp
         {isLoading ? (
           <>
             <Sparkles className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
-            ✨ Brewing Magic...
+            ✨ ပြုလုပ်နေပါသည်...
           </>
         ) : (
           <>
             <Sparkles className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-            🚀 Generate Post & Image
+            🚀 ပို့စ်နှင့် ပုံ ဖန်တီးမည်
           </>
         )}
       </Button>

@@ -80,7 +80,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10 safe-top">
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10 safe-top font-myanmar">
         <div className="container mx-auto px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
@@ -104,7 +104,7 @@ const Index = () => {
                   Story Design
                 </h1>
                 <p className="text-xs sm:text-sm text-muted-foreground hidden xs:block">
-                  ✨ AI-Powered Social Magic
+                  ✨ AI-Powered ဆိုရှယ် မက်ဂျစ်
                 </p>
               </div>
             </div>
@@ -113,7 +113,7 @@ const Index = () => {
                 <svg className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="hidden sm:inline">Pricing</span>
+                <span className="hidden sm:inline">စျေးနှုန်း</span>
                 <span className="sm:hidden">💰</span>
               </Button>
             </Link>
@@ -122,12 +122,12 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-4 sm:py-6 md:py-8 pb-20 sm:pb-8">
+      <main className="container mx-auto px-4 py-4 sm:py-6 md:py-8 pb-20 sm:pb-8 font-myanmar">
         <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto">
           {/* Left Column - Form */}
           <div className="bg-card border border-border rounded-2xl p-4 sm:p-6 shadow-lg h-fit lg:sticky lg:top-24">
             <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-card-foreground">
-              🎨 Craft Your Masterpiece
+              🎨 သင့်ရဲ့ လက်ရာမြောက်ပုံ ဖန်တီးပါ
             </h2>
             <PostGeneratorForm
               onSubmit={handleGenerate}
@@ -148,10 +148,10 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border mt-8 sm:mt-16">
+      <footer className="border-t border-border mt-8 sm:mt-16 font-myanmar">
         <div className="container mx-auto px-4 py-6 text-center text-xs sm:text-sm text-muted-foreground">
-          <p className="mb-2">✨ Crafted with 💜 for Myanmar K-pop fans & creative souls</p>
-          <p className="text-xs opacity-70">© 2024 Story Design. Making social media magic, one post at a time.</p>
+          <p className="mb-2">✨ မြန်မာ K-pop ပရိသတ်များနှင့် တီထွင်မှုရှိသူများအတွက် 💜 ဖြင့် ဖန်တီးထားပါသည်</p>
+          <p className="text-xs opacity-70">© 2024 Story Design. ဆိုရှယ်မီဒီယာ မက်ဂျစ်များကို ပို့စ်တစ်ခုချင်းစီ ဖန်တီးပေးနေပါသည်။</p>
         </div>
       </footer>
     </div>

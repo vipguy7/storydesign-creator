@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Copy, Download, Loader2 } from "lucide-react";
+import { Copy, Download, Loader2, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface GeneratedPostProps {
@@ -18,7 +18,25 @@ export const GeneratedPost = ({
   const handleCopyText = async () => {
     if (text) {
       await navigator.clipboard.writeText(text);
-      toast.success("Text copied to clipboard!");
+      toast.success("📋 စာသားကို clipboard သို့ ကူးယူပြီးပါပြီ!");
+    }
+  };
+
+  const handleShareText = async () => {
+    if (text && navigator.share) {
+      try {
+        await navigator.share({
+          title: "Story Design Post",
+          text: text,
+        });
+        toast.success("✨ မျှဝေပြီးပါပြီ!");
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") {
+          toast.error("မျှဝေ၍ မရပါ။");
+        }
+      }
+    } else {
+      handleCopyText();
     }
   };
 
@@ -30,7 +48,7 @@ export const GeneratedPost = ({
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      toast.success("Image downloaded!");
+      toast.success("📥 ပုံကို ဒေါင်းလုဒ်လုပ်ပြီးပါပြီ!");
     }
   };
 
@@ -45,13 +63,13 @@ export const GeneratedPost = ({
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      toast.success("Text downloaded!");
+      toast.success("📥 စာသားကို ဒေါင်းလုဒ်လုပ်ပြီးပါပြီ!");
     }
   };
 
   if (!text && !image && !isGeneratingText && !isGeneratingImage) {
     return (
-      <div className="h-full min-h-[300px] flex items-center justify-center">
+      <div className="h-full min-h-[300px] flex items-center justify-center font-myanmar">
         <div className="text-center space-y-4 p-6 sm:p-8">
           <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto bg-gradient-primary rounded-full flex items-center justify-center shadow-glow animate-pulse">
             <svg
@@ -69,10 +87,10 @@ export const GeneratedPost = ({
             </svg>
           </div>
           <h3 className="text-lg sm:text-xl font-semibold text-foreground">
-            ✨ Your Canvas Awaits!
+            ✨ သင့်ရဲ့ ကင်းဗတ်စ် စောင့်နေပါတယ်!
           </h3>
           <p className="text-sm sm:text-base text-muted-foreground max-w-sm mx-auto leading-relaxed">
-            Fill in the form on the left and hit that magic button to create <span className="text-primary font-semibold">stunning social media posts</span> that'll make your Myanmar audience go wild! 🎨💜
+            ဘယ်ဘက်မှာ ဖောင်ကို ဖြည့်ပြီး ခလုတ်ကို နှိပ်ပါ! <span className="text-primary font-semibold">လှပသော ဆိုရှယ်မီဒီယာ ပို့စ်များ</span> ဖန်တီးလိုက်ပါ! 🎨💜
           </p>
         </div>
       </div>
@@ -80,12 +98,12 @@ export const GeneratedPost = ({
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 font-myanmar">
       {/* Generated Text Section */}
       <div className="bg-card border border-border rounded-2xl p-4 sm:p-6 shadow-lg">
         <div className="flex items-center justify-between mb-4 gap-2">
           <h3 className="text-base sm:text-lg font-semibold text-card-foreground">
-            ✍️ Your Post
+            ✍️ သင့် ပို့စ်
           </h3>
           {text && (
             <div className="flex gap-1.5 sm:gap-2">
@@ -96,7 +114,7 @@ export const GeneratedPost = ({
                 className="rounded-xl text-xs sm:text-sm touch-manipulation"
               >
                 <Copy className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Copy</span>
+                <span className="hidden sm:inline">ကူးယူမည်</span>
               </Button>
               <Button
                 variant="outline"
@@ -105,7 +123,16 @@ export const GeneratedPost = ({
                 className="rounded-xl text-xs sm:text-sm touch-manipulation"
               >
                 <Download className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Download</span>
+                <span className="hidden sm:inline">ဒေါင်းလုဒ်</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleShareText}
+                className="rounded-xl text-xs sm:text-sm touch-manipulation"
+              >
+                <Share2 className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                <span className="hidden sm:inline">မျှဝေမည်</span>
               </Button>
             </div>
           )}
@@ -115,7 +142,7 @@ export const GeneratedPost = ({
             <div className="flex items-center justify-center h-[150px] sm:h-[200px]">
               <div className="text-center space-y-3">
                 <Loader2 className="h-7 w-7 sm:h-8 sm:w-8 animate-spin mx-auto text-primary" />
-                <p className="text-sm sm:text-base text-muted-foreground">✨ Weaving words into magic...</p>
+                <p className="text-sm sm:text-base text-muted-foreground">✨ စာသားများ ဖန်တီးနေပါသည်...</p>
               </div>
             </div>
           ) : text ? (
@@ -130,7 +157,7 @@ export const GeneratedPost = ({
       <div className="bg-card border border-border rounded-2xl p-4 sm:p-6 shadow-lg">
         <div className="flex items-center justify-between mb-4 gap-2">
           <h3 className="text-base sm:text-lg font-semibold text-card-foreground">
-            🎨 Your Visual
+            🎨 သင့် ဒီဇိုင်း
           </h3>
           {image && (
             <Button
@@ -140,7 +167,7 @@ export const GeneratedPost = ({
               className="rounded-xl text-xs sm:text-sm touch-manipulation"
             >
               <Download className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
-              <span className="hidden sm:inline">Download</span>
+              <span className="hidden sm:inline">ဒေါင်းလုဒ်</span>
             </Button>
           )}
         </div>
@@ -149,7 +176,7 @@ export const GeneratedPost = ({
             <div className="flex items-center justify-center h-[200px] sm:h-[300px]">
               <div className="text-center space-y-3">
                 <Loader2 className="h-7 w-7 sm:h-8 sm:w-8 animate-spin mx-auto text-primary" />
-                <p className="text-sm sm:text-base text-muted-foreground">🎨 Painting your masterpiece...</p>
+                <p className="text-sm sm:text-base text-muted-foreground">🎨 ပုံကို ဆွဲနေပါသည်...</p>
               </div>
             </div>
           ) : image ? (
