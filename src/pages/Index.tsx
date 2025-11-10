@@ -80,13 +80,13 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center shadow-glow">
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10 safe-top">
+        <div className="container mx-auto px-4 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-primary rounded-xl flex items-center justify-center shadow-glow flex-shrink-0">
                 <svg
-                  className="w-6 h-6 text-white"
+                  className="w-5 h-5 sm:w-6 sm:h-6 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -99,21 +99,22 @@ const Index = () => {
                   />
                 </svg>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent truncate">
                   Story Design
                 </h1>
-                <p className="text-sm text-muted-foreground">
-                  AI-Powered Social Post Creator
+                <p className="text-xs sm:text-sm text-muted-foreground hidden xs:block">
+                  ✨ AI-Powered Social Magic
                 </p>
               </div>
             </div>
-            <Link to="/pricing">
-              <Button variant="outline" size="sm">
-                <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <Link to="/pricing" className="flex-shrink-0">
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                <svg className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Pricing Calculator
+                <span className="hidden sm:inline">Pricing</span>
+                <span className="sm:hidden">💰</span>
               </Button>
             </Link>
           </div>
@@ -121,12 +122,12 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+      <main className="container mx-auto px-4 py-4 sm:py-6 md:py-8 pb-20 sm:pb-8">
+        <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto">
           {/* Left Column - Form */}
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-lg h-fit sticky top-24">
-            <h2 className="text-xl font-semibold mb-6 text-card-foreground">
-              Create Your Post
+          <div className="bg-card border border-border rounded-2xl p-4 sm:p-6 shadow-lg h-fit lg:sticky lg:top-24">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-card-foreground">
+              🎨 Craft Your Masterpiece
             </h2>
             <PostGeneratorForm
               onSubmit={handleGenerate}
@@ -135,7 +136,7 @@ const Index = () => {
           </div>
 
           {/* Right Column - Generated Content */}
-          <div>
+          <div className="lg:min-h-screen">
             <GeneratedPost
               text={generatedText}
               image={generatedImage}
@@ -147,9 +148,10 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border mt-16">
-        <div className="container mx-auto px-4 py-6 text-center text-sm text-muted-foreground">
-          <p>© 2024 Story Design. Crafted with 💜 for Myanmar K-pop fans</p>
+      <footer className="border-t border-border mt-8 sm:mt-16">
+        <div className="container mx-auto px-4 py-6 text-center text-xs sm:text-sm text-muted-foreground">
+          <p className="mb-2">✨ Crafted with 💜 for Myanmar K-pop fans & creative souls</p>
+          <p className="text-xs opacity-70">© 2024 Story Design. Making social media magic, one post at a time.</p>
         </div>
       </footer>
     </div>
