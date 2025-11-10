@@ -3,7 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PostType, PostTone, PRODUCTS } from "@/lib/constants";
-import { Sparkles } from "lucide-react";
+import { Sparkles, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface PostGeneratorFormProps {
   onSubmit: (data: {
@@ -38,42 +44,60 @@ export const PostGeneratorForm = ({ onSubmit, isLoading }: PostGeneratorFormProp
     <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
       <div className="space-y-2">
         <Label className="text-sm sm:text-base font-semibold">📝 Choose Your Vibe</Label>
-        <div className="grid grid-cols-2 gap-2">
-          {Object.values(PostType).map((type) => (
-            <button
-              key={type}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
               type="button"
-              onClick={() => setPostType(type)}
-              className={`p-2.5 sm:p-3 rounded-xl text-xs sm:text-sm font-medium transition-all touch-manipulation ${
-                postType === type
-                  ? "bg-gradient-primary text-white shadow-glow"
-                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80 active:scale-95"
-              }`}
+              variant="outline"
+              className="w-full justify-between text-left font-medium h-auto py-3 px-4"
             >
-              {type}
-            </button>
-          ))}
-        </div>
+              <span className="truncate">{postType}</span>
+              <ChevronDown className="h-4 w-4 ml-2 flex-shrink-0 opacity-50" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[300px] overflow-y-auto bg-background z-50">
+            {Object.values(PostType).map((type) => (
+              <DropdownMenuItem
+                key={type}
+                onClick={() => setPostType(type)}
+                className={`cursor-pointer ${
+                  postType === type ? "bg-accent text-accent-foreground" : ""
+                }`}
+              >
+                {type}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className="space-y-2">
         <Label className="text-sm sm:text-base font-semibold">🎭 Set the Mood</Label>
-        <div className="grid grid-cols-2 gap-2">
-          {Object.values(PostTone).map((tone) => (
-            <button
-              key={tone}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
               type="button"
-              onClick={() => setPostTone(tone)}
-              className={`p-2.5 sm:p-3 rounded-xl text-xs sm:text-sm font-medium transition-all touch-manipulation ${
-                postTone === tone
-                  ? "bg-gradient-primary text-white shadow-glow"
-                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80 active:scale-95"
-              }`}
+              variant="outline"
+              className="w-full justify-between text-left font-medium h-auto py-3 px-4"
             >
-              {tone}
-            </button>
-          ))}
-        </div>
+              <span className="truncate">{postTone}</span>
+              <ChevronDown className="h-4 w-4 ml-2 flex-shrink-0 opacity-50" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[300px] overflow-y-auto bg-background z-50">
+            {Object.values(PostTone).map((tone) => (
+              <DropdownMenuItem
+                key={tone}
+                onClick={() => setPostTone(tone)}
+                className={`cursor-pointer ${
+                  postTone === tone ? "bg-accent text-accent-foreground" : ""
+                }`}
+              >
+                {tone}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className="space-y-2">

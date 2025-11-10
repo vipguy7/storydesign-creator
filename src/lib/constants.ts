@@ -2,17 +2,24 @@ export enum PostType {
   PROMOTION = "Promotion",
   NEW_PRODUCT = "New Product Introduction",
   SPECIAL_SALES = "Special Sales",
+  SALE_PACKAGE_PROMO = "Sale Package Promo",
   ENGAGING_CONTENT = "Engaging Content",
   KNOWLEDGE_SHARING = "Knowledge Sharing",
   TRADITIONAL_EVENT = "Myanmar Traditional Event",
   SEASONAL_CONTENT = "Seasonal Content",
+  BEHIND_THE_SCENES = "Behind The Scenes",
+  CUSTOMER_TESTIMONIAL = "Customer Testimonial",
 }
 
 export enum PostTone {
-  FRIENDLY = "Friendly",
-  EMOTIONAL = "Emotional",
-  PROFESSIONAL = "Professional",
-  URGENT = "Urgent",
+  FRIENDLY = "Friendly & Casual",
+  EMOTIONAL = "Emotional & Heartfelt",
+  PROFESSIONAL = "Professional & Polished",
+  URGENT = "Urgent & Action-Driven",
+  PLAYFUL = "Playful & Fun",
+  INSPIRATIONAL = "Inspirational & Motivating",
+  TRENDY = "Trendy & Hip",
+  LUXURIOUS = "Luxurious & Premium",
 }
 
 export const PRODUCTS = [
