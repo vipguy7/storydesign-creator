@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Copy, Download, Loader2, Share2 } from "lucide-react";
+import { Copy, Download, Loader2, Share2, Star } from "lucide-react";
 import { toast } from "sonner";
 
 interface GeneratedPostProps {
@@ -7,6 +7,13 @@ interface GeneratedPostProps {
   image: string | null;
   isGeneratingText: boolean;
   isGeneratingImage: boolean;
+}
+
+interface SavedPost {
+  id: string;
+  postText: string;
+  imageUrl?: string;
+  timestamp: number;
 }
 
 export const GeneratedPost = ({
@@ -20,6 +27,24 @@ export const GeneratedPost = ({
       await navigator.clipboard.writeText(text);
       toast.success("📋 စာသားကို clipboard သို့ ကူးယူပြီးပါပြီ!");
     }
+  };
+
+  const handleSavePost = () => {
+    if (!text) return;
+    
+    const savedPosts = localStorage.getItem("savedPosts");
+    const posts: SavedPost[] = savedPosts ? JSON.parse(savedPosts) : [];
+    
+    const newPost: SavedPost = {
+      id: Date.now().toString(),
+      postText: text,
+      imageUrl: image || undefined,
+      timestamp: Date.now(),
+    };
+    
+    posts.unshift(newPost);
+    localStorage.setItem("savedPosts", JSON.stringify(posts));
+    toast.success("⭐ ပို့စ်ကို သိမ်းဆည်းပြီးပါပြီ!");
   };
 
   const handleShareText = async () => {
@@ -107,6 +132,15 @@ export const GeneratedPost = ({
           </h3>
           {text && (
             <div className="flex gap-1.5 sm:gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSavePost}
+                className="rounded-xl text-xs sm:text-sm touch-manipulation bg-gradient-primary text-white hover:shadow-glow border-0"
+              >
+                <Star className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                <span className="hidden sm:inline">သိမ်းမည်</span>
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
