@@ -26,37 +26,58 @@ serve(async (req) => {
 BUSINESS CONTEXT:
 - Primary Audience: K-pop fans aged 15-30 who love trendy, creative designs
 - Secondary Audience: Small businesses and individuals needing printing services
-- Products: Greeting Cards, Business Cards, Invitation Cards, Packaging Design, Posters & Banners, Stickers & Labels, Photo Printing, Logo Design, Flyers & Brochures, Social Media Graphics
+- Products: Photo Books, Notebooks, Calendars, Photo Prints, Photo Pins, Photo Fans, Fan Gifts, Keychains, Mini Notebooks, Photocards, Logo Design, Advertisement Design, Branding, Social Media Graphics, Vinyl & Billboard Design
 
-ADVANCED BURMESE SOCIAL MEDIA STRATEGY:
+INSIGHTS FROM SUCCESSFUL MYANMAR FACEBOOK/TIKTOK BUSINESSES:
 
-1. POST STRUCTURE:
-   - Hook (1-2 lines): Attention-grabbing opener with emoji
-   - Body (3-5 lines): Product benefits, emotional connection
-   - CTA (1-2 lines): Clear action with urgency
-   - Hashtags (5-8): Mix Myanmar and K-pop related
+1. PROVEN CONTENT PATTERNS:
+   - Start with relatable problems/emotions: "အချိန်တိုင်း သတိရနေတာလား?" "မင်းရဲ့ idol ကို ဘယ်လိုထောက်ခံမလဲ?"
+   - Use conversational tone with "မင်း", "ရှင့်", "သူငယ်ချင်း" naturally
+   - Include testimonial-style language: "အရမ်းကြိုက်တယ်", "မှာယူပြီးပြီ", "လက်ခံရရှိပြီး ပျော်သွားတယ်"
+   - Create urgency: "လက်ကျန်နည်းနေပြီ", "ဒီအပတ်သာ", "အရေအတွက်အကန့်အသတ်ရှိသည်"
 
-2. LANGUAGE STYLE:
-   - Use authentic Burmese (Myanmar Unicode)
-   - Mix in trendy "Burglish" (Burmese + English) naturally
-   - Examples: "super cute", "order လုပ်လို့ရပြီ", "limited edition"
-   - Use K-pop references when relevant
-   
-3. EMOJI USAGE:
-   - Strategic placement (not overwhelming)
-   - K-pop themed: 💜 🌟 ✨ 💝 🎀
-   - Product themed: 🎨 📸 🎁 💌 🏆
+2. MYANMAR-SPECIFIC WRITING STYLE:
+   - Mix Burmese and English naturally like young Myanmar people: "super special ဖြစ်တဉ်", "customize လုပ်လို့ရတယ်", "limited edition လေး"
+   - Use trending Myanmar phrases: "ရင်ခုန်သွားတာပဲ", "မပျက်သင့်ဘူး", "ရသင့်ရမယ့်အရာ"
+   - Add Myanmar cultural touch: "လက်ဆောင်လေးတွေ", "အမှတ်တရလေး", "အထူးဖန်တီးထားတဲ့"
+   - Use questions to engage: "မင်းလည်း မှာကြည့်စမ်းလား?", "ဘယ်သူတွေ စိတ်ဝင်စားလဲ?"
 
-4. TONE GUIDELINES:
-   - Friendly: Like chatting with a close friend, use "ရှင့်" naturally
-   - Emotional: Heartfelt, nostalgic, touching
-   - Professional: Polite but warm, show expertise
-   - Urgent: FOMO-driven, limited time emphasis
+3. ADVANCED EMOJI STRATEGY:
+   - Start with attention emoji: ✨ 💫 🌟 ⚡
+   - K-pop/fan culture: 💜 💗 🎀 ⭐ 🌸 
+   - Product highlight: 📸 🎨 🎁 💌 🔖 
+   - Call to action: 👉 📲 🛒 💝
+   - Don't overload - max 8-10 emojis per post
+
+4. POST STRUCTURE (Myanmar Style):
+   - Hook (1 line): Emotional/relatable question or statement
+   - Story (2-3 lines): Create scenario where product solves problem
+   - Features (1-2 lines): Highlight customization/quality
+   - Social Proof (1 line): Mention popularity/satisfaction
+   - CTA (1 line): Clear action with gentle urgency
+   - Hashtags (6-10): Mix Burmese and English, include trending tags
+
+5. TONE EXECUTION:
+   - Friendly: Like a friend sharing a secret, warm and casual
+   - Emotional: Connect memories with products, heartfelt language
+   - Professional: Maintain friendliness but show expertise and quality
+   - Urgent: Create FOMO without being pushy, limited availability
+   - Playful: Use cute expressions, lighthearted tone, fun scenarios
+   - Inspirational: Motivate creativity and self-expression
+   - Trendy: Reference current K-pop trends, use hip language
+   - Luxurious: Emphasize quality, exclusivity, premium experience
+
+6. HASHTAG STRATEGY:
+   - Brand: #StoryDesignMM #StoryDesign
+   - Product: #PhotoBook #Keychain #Photocard
+   - Myanmar: #Myanmar #YangonShopping #MyanmarOnlineShop
+   - K-pop: #Kpop #KpopMerch #BiasMerch #FanSupport
+   - Trending: Use current Myanmar/K-pop trending tags
 
 IMPORTANT: Return ONLY valid JSON with two keys:
 {
-  "postText": "The complete Burmese social media post",
-  "imagePrompt": "A detailed English description for image generation (3-4 sentences, focusing on visual elements, colors, style, and mood)"
+  "postText": "The complete Burmese social media post following all guidelines above",
+  "imagePrompt": "A detailed English description for image generation (3-4 sentences, focusing on visual elements, colors, K-pop aesthetic, and mood)"
 }`;
 
     const userPrompt = `Create a ${postType} post with a ${postTone} tone for these products: ${products.join(", ")}.

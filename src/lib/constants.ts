@@ -56,6 +56,18 @@ export const PRODUCTS = [
     name: "Fan Supporting Gifts",
     description: "Various fan merchandise and supporting gifts. Perfect for K-pop concerts and fan meetings."
   },
+  {
+    name: "Customized Keychain",
+    description: "Personalized keychains - 2.5in W x 1.5in H. Perfect for bags, keys, and K-pop collections."
+  },
+  {
+    name: "Mini Notebook",
+    description: "Customized mini notebook with photo overlay - 4in W x 6in H, lined pages. Perfect for daily notes and journaling."
+  },
+  {
+    name: "Photocards Mini",
+    description: "Mini photocards - 2in W x 3in H. Collect and trade your favorite designs, perfect for K-pop fans."
+  },
   // Graphic Design Services
   {
     name: "Logo Design",
