@@ -16,8 +16,10 @@ serve(async (req) => {
     console.log("Generating post with:", { postType, postTone, products, additionalInfo });
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    
+    if (!LOVABLE_API_KEY && !GEMINI_API_KEY) {
+      throw new Error("No AI API keys configured");
     }
 
     // Construct the detailed prompt for the AI
@@ -85,42 +87,98 @@ ${additionalInfo ? `Additional context: ${additionalInfo}` : ""}
 
 Make it authentic, engaging, and tailored for Myanmar K-pop fans!`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        response_format: { type: "json_object" }
-      }),
-    });
+    let content;
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+    // Try Lovable AI first
+    if (LOVABLE_API_KEY) {
+      try {
+        console.log("Attempting to use Lovable AI...");
+        const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-pro",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt }
+            ],
+            response_format: { type: "json_object" }
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          content = data.choices?.[0]?.message?.content;
+          console.log("Successfully used Lovable AI");
+        } else if (response.status === 402 && GEMINI_API_KEY) {
+          console.log("Lovable AI credits exhausted, falling back to Gemini...");
+          // Fall through to Gemini fallback
+        } else if (response.status === 429) {
+          return new Response(
+            JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        } else {
+          const errorText = await response.text();
+          console.error("Lovable AI error:", response.status, errorText);
+          if (!GEMINI_API_KEY) {
+            throw new Error("AI service error");
+          }
+          // Fall through to Gemini fallback
+        }
+      } catch (error) {
+        console.error("Lovable AI failed:", error);
+        if (!GEMINI_API_KEY) {
+          throw error;
+        }
+        // Fall through to Gemini fallback
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI usage limit reached. Please add credits to continue." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      throw new Error("AI service error");
     }
 
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
+    // Fallback to Gemini if Lovable AI failed or credits exhausted
+    if (!content && GEMINI_API_KEY) {
+      console.log("Using Gemini API...");
+      const geminiResponse = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `${systemPrompt}\n\n${userPrompt}`
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.9,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 2048,
+              responseMimeType: "application/json"
+            }
+          }),
+        }
+      );
+
+      if (!geminiResponse.ok) {
+        const errorText = await geminiResponse.text();
+        console.error("Gemini API error:", geminiResponse.status, errorText);
+        throw new Error("Gemini API service error");
+      }
+
+      const geminiData = await geminiResponse.json();
+      content = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+      console.log("Successfully used Gemini API");
+    }
+
+    if (!content) {
+      throw new Error("Failed to generate content with any AI provider");
+    }
     
     if (!content) {
       throw new Error("No content received from AI");
