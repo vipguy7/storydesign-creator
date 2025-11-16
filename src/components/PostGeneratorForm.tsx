@@ -26,7 +26,6 @@ export const PostGeneratorForm = ({ onSubmit, isLoading }: PostGeneratorFormProp
   const [postTone, setPostTone] = useState<PostTone>(PostTone.FRIENDLY);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [additionalInfo, setAdditionalInfo] = useState("");
-  const [customerName, setCustomerName] = useState("");
 
   const toggleProduct = (productName: string) => {
     setSelectedProducts(prev =>
@@ -147,20 +146,6 @@ export const PostGeneratorForm = ({ onSubmit, isLoading }: PostGeneratorFormProp
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="customer-name" className="text-sm sm:text-base font-semibold">
-          👤 အမည်
-        </Label>
-        <input
-          id="customer-name"
-          type="text"
-          value={customerName}
-          onChange={(e) => setCustomerName(e.target.value)}
-          placeholder="သင့်အမည် ထည့်ပါ"
-          className="w-full px-3 py-2 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-        />
       </div>
 
       <div className="space-y-2">
