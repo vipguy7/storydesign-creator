@@ -150,8 +150,18 @@ Make it authentic, engaging, and tailored for Myanmar K-pop fans!`;
           const data = await response.json();
           content = data.choices?.[0]?.message?.content;
           console.log("Successfully used Lovable AI");
-        } else if (response.status === 402 && GEMINI_API_KEY) {
-          console.log("Lovable AI credits exhausted, falling back to Gemini...");
+        } else if (response.status === 402) {
+          const errorText = await response.text();
+          console.error("Lovable AI credits exhausted:", errorText);
+          if (!GEMINI_API_KEY) {
+            return new Response(
+              JSON.stringify({ 
+                error: "AI usage limit reached. Please add credits to your Lovable workspace to continue." 
+              }),
+              { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          console.log("Falling back to Gemini...");
           // Fall through to Gemini fallback
         } else if (response.status === 429) {
           return new Response(
@@ -162,7 +172,10 @@ Make it authentic, engaging, and tailored for Myanmar K-pop fans!`;
           const errorText = await response.text();
           console.error("Lovable AI error:", response.status, errorText);
           if (!GEMINI_API_KEY) {
-            throw new Error("AI service error");
+            return new Response(
+              JSON.stringify({ error: "AI service temporarily unavailable. Please try again." }),
+              { status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
           }
           // Fall through to Gemini fallback
         }
