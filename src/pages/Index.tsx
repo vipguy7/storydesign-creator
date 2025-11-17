@@ -3,11 +3,12 @@ import { PostGeneratorForm } from "@/components/PostGeneratorForm";
 import { GeneratedPost } from "@/components/GeneratedPost";
 import { SavedLibrary } from "@/components/SavedLibrary";
 import { PostType, PostTone } from "@/lib/constants";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BookMarked } from "lucide-react";
+import { validatePostInput } from "@/lib/validation";
+import { invokeWithRetry, handleApiError } from "@/lib/apiClient";
 
 const Index = () => {
   const [generatedText, setGeneratedText] = useState<string | null>(null);
@@ -22,6 +23,14 @@ const Index = () => {
     products: string[];
     additionalInfo: string;
   }) => {
+    // Validate input
+    const validation = validatePostInput(data);
+    if (!validation.success) {
+      const firstError = validation.error.errors[0];
+      toast.error(firstError.message);
+      return;
+    }
+
     // Reset state
     setGeneratedText(null);
     setGeneratedImage(null);
@@ -29,52 +38,38 @@ const Index = () => {
     setIsGeneratingImage(true);
 
     try {
-      // Step 1: Generate text and image prompt
-      const { data: postData, error: postError } = await supabase.functions.invoke(
-        "generate-post",
-        {
-          body: {
-            postType: data.postType,
-            postTone: data.postTone,
-            products: data.products,
-            additionalInfo: data.additionalInfo,
-          },
-        }
-      );
-
-      if (postError) throw postError;
+      // Step 1: Generate text and image prompt with retry
+      const postData = await invokeWithRetry<{
+        postText: string;
+        imagePrompt: string;
+      }>("generate-post", {
+        postType: data.postType,
+        postTone: data.postTone,
+        products: data.products,
+        additionalInfo: data.additionalInfo,
+      });
 
       const { postText, imagePrompt } = postData;
 
       // Update with generated text
       setGeneratedText(postText);
       setIsGeneratingText(false);
-      toast.success("Post text generated!");
+      toast.success("ပို့စ် စာသား ထုတ်ပေးပြီးပါပြီ!");
 
-      // Step 2: Generate image using the prompt
-      const { data: imageData, error: imageError } = await supabase.functions.invoke(
+      // Step 2: Generate image using the prompt with retry
+      const imageData = await invokeWithRetry<{ imageUrl: string }>(
         "generate-image",
-        {
-          body: { prompt: imagePrompt },
-        }
+        { prompt: imagePrompt },
+        { maxRetries: 2, timeout: 90000 } // Longer timeout for images
       );
-
-      if (imageError) throw imageError;
 
       setGeneratedImage(imageData.imageUrl);
       setIsGeneratingImage(false);
-      toast.success("Image generated!");
+      toast.success("ပုံ ထုတ်ပေးပြီးပါပြီ!");
     } catch (error: any) {
-      console.error("Generation error:", error);
-      
-      if (error.message?.includes("429") || error.message?.includes("rate limit")) {
-        toast.error("Too many requests. Please wait a moment and try again.");
-      } else if (error.message?.includes("402") || error.message?.includes("credits")) {
-        toast.error("AI usage limit reached. Please add credits to continue.");
-      } else {
-        toast.error("Failed to generate content. Please try again.");
-      }
-      
+      const errorMessage = handleApiError(error);
+      toast.error(errorMessage);
+
       setIsGeneratingText(false);
       setIsGeneratingImage(false);
     }

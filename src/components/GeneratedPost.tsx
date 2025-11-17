@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Copy, Download, Loader2, Share2, Star } from "lucide-react";
 import { toast } from "sonner";
+import { safeStorage } from "@/lib/storage";
 
 interface GeneratedPostProps {
   text: string | null;
@@ -24,27 +25,42 @@ export const GeneratedPost = ({
 }: GeneratedPostProps) => {
   const handleCopyText = async () => {
     if (text) {
-      await navigator.clipboard.writeText(text);
-      toast.success("📋 စာသားကို clipboard သို့ ကူးယူပြီးပါပြီ!");
+      try {
+        await navigator.clipboard.writeText(text);
+        toast.success("📋 စာသားကို clipboard သို့ ကူးယူပြီးပါပြီ!");
+      } catch (error) {
+        console.error("Copy failed:", error);
+        toast.error("ကူးယူ၍ မရပါ။");
+      }
     }
   };
 
   const handleSavePost = () => {
     if (!text) return;
-    
-    const savedPosts = localStorage.getItem("savedPosts");
-    const posts: SavedPost[] = savedPosts ? JSON.parse(savedPosts) : [];
-    
-    const newPost: SavedPost = {
-      id: Date.now().toString(),
-      postText: text,
-      imageUrl: image || undefined,
-      timestamp: Date.now(),
-    };
-    
-    posts.unshift(newPost);
-    localStorage.setItem("savedPosts", JSON.stringify(posts));
-    toast.success("⭐ ပို့စ်ကို သိမ်းဆည်းပြီးပါပြီ!");
+
+    try {
+      const savedPostsStr = safeStorage.getItem("savedPosts");
+      const posts: SavedPost[] = savedPostsStr ? JSON.parse(savedPostsStr) : [];
+
+      const newPost: SavedPost = {
+        id: Date.now().toString(),
+        postText: text,
+        imageUrl: image || undefined,
+        timestamp: Date.now(),
+      };
+
+      posts.unshift(newPost);
+      const success = safeStorage.setItem("savedPosts", JSON.stringify(posts));
+      
+      if (success) {
+        toast.success("⭐ ပို့စ်ကို သိမ်းဆည်းပြီးပါပြီ!");
+      } else {
+        toast.error("သိမ်းဆည်း၍ မရပါ။ သိုလှောင်မှု ပြည့်နေပါသည်။");
+      }
+    } catch (error) {
+      console.error("Save failed:", error);
+      toast.error("သိမ်းဆည်း၍ မရပါ။");
+    }
   };
 
   const handleShareText = async () => {
@@ -67,13 +83,18 @@ export const GeneratedPost = ({
 
   const handleDownloadImage = () => {
     if (image) {
-      const link = document.createElement("a");
-      link.href = image;
-      link.download = `story-design-post-${Date.now()}.jpg`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      toast.success("📥 ပုံကို ဒေါင်းလုဒ်လုပ်ပြီးပါပြီ!");
+      try {
+        const link = document.createElement("a");
+        link.href = image;
+        link.download = `story-design-post-${Date.now()}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success("📥 ပုံကို ဒေါင်းလုဒ်လုပ်ပြီးပါပြီ!");
+      } catch (error) {
+        console.error("Download failed:", error);
+        toast.error("ဒေါင်းလုဒ်လုပ်၍ မရပါ။");
+      }
     }
   };
 

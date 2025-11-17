@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { X, Download, Share2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { safeStorage } from "@/lib/storage";
 
 interface SavedPost {
   id: string;
@@ -23,30 +24,45 @@ export const SavedLibrary = ({ onClose }: SavedLibraryProps) => {
   }, []);
 
   const loadSavedPosts = () => {
-    const saved = localStorage.getItem("savedPosts");
-    if (saved) {
-      setSavedPosts(JSON.parse(saved));
+    try {
+      const saved = safeStorage.getItem("savedPosts");
+      if (saved) {
+        setSavedPosts(JSON.parse(saved));
+      }
+    } catch (error) {
+      console.error("Failed to load saved posts:", error);
+      toast.error("ပို့စ်များ ဖတ်၍ မရပါ။");
     }
   };
 
   const deletePost = (id: string) => {
-    const updated = savedPosts.filter(post => post.id !== id);
-    setSavedPosts(updated);
-    localStorage.setItem("savedPosts", JSON.stringify(updated));
-    toast.success("ပို့စ်ကို ဖျက်ပြီးပါပြီ");
+    try {
+      const updated = savedPosts.filter(post => post.id !== id);
+      setSavedPosts(updated);
+      safeStorage.setItem("savedPosts", JSON.stringify(updated));
+      toast.success("ပို့စ်ကို ဖျက်ပြီးပါပြီ");
+    } catch (error) {
+      console.error("Delete failed:", error);
+      toast.error("ဖျက်၍ မရပါ။");
+    }
   };
 
   const downloadPost = (post: SavedPost) => {
-    const blob = new Blob([post.postText], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `story-design-post-${Date.now()}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success("ပို့စ်ကို ဒေါင်းလုဒ်လုပ်ပြီးပါပြီ");
+    try {
+      const blob = new Blob([post.postText], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `story-design-post-${Date.now()}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("ပို့စ်ကို ဒေါင်းလုဒ်လုပ်ပြီးပါပြီ");
+    } catch (error) {
+      console.error("Download failed:", error);
+      toast.error("ဒေါင်းလုဒ်လုပ်၍ မရပါ။");
+    }
   };
 
   const sharePost = async (post: SavedPost) => {
@@ -57,11 +73,18 @@ export const SavedLibrary = ({ onClose }: SavedLibraryProps) => {
         });
         toast.success("ပို့စ်ကို မျှဝေပြီးပါပြီ");
       } catch (error) {
-        console.log("Share cancelled");
+        if ((error as Error).name !== "AbortError") {
+          console.error("Share failed:", error);
+        }
       }
     } else {
-      navigator.clipboard.writeText(post.postText);
-      toast.success("ပို့စ်ကို clipboard သို့ကူးယူပြီးပါပြီ");
+      try {
+        await navigator.clipboard.writeText(post.postText);
+        toast.success("ပို့စ်ကို clipboard သို့ကူးယူပြီးပါပြီ");
+      } catch (error) {
+        console.error("Copy failed:", error);
+        toast.error("ကူးယူ၍ မရပါ။");
+      }
     }
   };
 

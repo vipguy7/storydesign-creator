@@ -11,7 +11,44 @@ serve(async (req) => {
   }
 
   try {
-    const { postType, postTone, products, additionalInfo } = await req.json();
+    const body = await req.json();
+    const { postType, postTone, products, additionalInfo } = body;
+
+    // Input validation
+    if (!postType || typeof postType !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Invalid postType parameter' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!postTone || typeof postTone !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Invalid postTone parameter' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!Array.isArray(products) || products.length === 0) {
+      return new Response(
+        JSON.stringify({ error: 'Products array is required and must not be empty' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (products.length > 10) {
+      return new Response(
+        JSON.stringify({ error: 'Maximum 10 products allowed' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (additionalInfo && (typeof additionalInfo !== 'string' || additionalInfo.length > 1000)) {
+      return new Response(
+        JSON.stringify({ error: 'Additional info must be a string with max 1000 characters' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
     
     console.log("Generating post with:", { postType, postTone, products, additionalInfo });
 

@@ -11,7 +11,23 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt } = await req.json();
+    const body = await req.json();
+    const { prompt } = body;
+
+    // Input validation
+    if (!prompt || typeof prompt !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Invalid prompt parameter' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (prompt.length > 2000) {
+      return new Response(
+        JSON.stringify({ error: 'Prompt must be less than 2000 characters' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
     
     console.log("Generating image with prompt:", prompt);
 
