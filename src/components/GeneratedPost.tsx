@@ -5,23 +5,18 @@ import { safeStorage } from "@/lib/storage";
 
 interface GeneratedPostProps {
   text: string | null;
-  image: string | null;
   isGeneratingText: boolean;
-  isGeneratingImage: boolean;
 }
 
 interface SavedPost {
   id: string;
   postText: string;
-  imageUrl?: string;
   timestamp: number;
 }
 
 export const GeneratedPost = ({
   text,
-  image,
   isGeneratingText,
-  isGeneratingImage,
 }: GeneratedPostProps) => {
   const handleCopyText = async () => {
     if (text) {
@@ -45,7 +40,6 @@ export const GeneratedPost = ({
       const newPost: SavedPost = {
         id: Date.now().toString(),
         postText: text,
-        imageUrl: image || undefined,
         timestamp: Date.now(),
       };
 
@@ -81,22 +75,6 @@ export const GeneratedPost = ({
     }
   };
 
-  const handleDownloadImage = () => {
-    if (image) {
-      try {
-        const link = document.createElement("a");
-        link.href = image;
-        link.download = `story-design-post-${Date.now()}.jpg`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        toast.success("📥 ပုံကို ဒေါင်းလုဒ်လုပ်ပြီးပါပြီ!");
-      } catch (error) {
-        console.error("Download failed:", error);
-        toast.error("ဒေါင်းလုဒ်လုပ်၍ မရပါ။");
-      }
-    }
-  };
 
   const handleDownloadText = () => {
     if (text) {
@@ -113,7 +91,7 @@ export const GeneratedPost = ({
     }
   };
 
-  if (!text && !image && !isGeneratingText && !isGeneratingImage) {
+  if (!text && !isGeneratingText) {
     return (
       <div className="h-full min-h-[300px] flex items-center justify-center font-myanmar">
         <div className="text-center space-y-4 p-6 sm:p-8">
@@ -208,42 +186,6 @@ export const GeneratedPost = ({
         </div>
       </div>
 
-      {/* Generated Image Section */}
-      <div className="bg-card border border-border rounded-2xl p-4 sm:p-6 shadow-lg">
-        <div className="flex items-center justify-between mb-4 gap-2">
-          <h3 className="text-base sm:text-lg font-semibold text-card-foreground">
-            🎨 သင့် ဒီဇိုင်း
-          </h3>
-          {image && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDownloadImage}
-              className="rounded-xl text-xs sm:text-sm touch-manipulation"
-            >
-              <Download className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
-              <span className="hidden sm:inline">ဒေါင်းလုဒ်</span>
-            </Button>
-          )}
-        </div>
-        <div className="min-h-[200px] sm:min-h-[300px]">
-          {isGeneratingImage ? (
-            <div className="flex items-center justify-center h-[200px] sm:h-[300px]">
-              <div className="text-center space-y-3">
-                <Loader2 className="h-7 w-7 sm:h-8 sm:w-8 animate-spin mx-auto text-primary" />
-                <p className="text-sm sm:text-base text-muted-foreground">🎨 ပုံကို ဆွဲနေပါသည်...</p>
-              </div>
-            </div>
-          ) : image ? (
-            <img
-              src={image}
-              alt="Generated social media post visual"
-              className="w-full rounded-xl shadow-md"
-              loading="lazy"
-            />
-          ) : null}
-        </div>
-      </div>
     </div>
   );
 };

@@ -12,9 +12,7 @@ import { invokeWithRetry, handleApiError } from "@/lib/apiClient";
 
 const Index = () => {
   const [generatedText, setGeneratedText] = useState<string | null>(null);
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isGeneratingText, setIsGeneratingText] = useState(false);
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [showLibrary, setShowLibrary] = useState(false);
 
   const handleGenerate = async (data: {
@@ -33,14 +31,12 @@ const Index = () => {
 
     // Reset state
     setGeneratedText(null);
-    setGeneratedImage(null);
     setIsGeneratingText(true);
-    setIsGeneratingImage(true);
 
     try {
-      // Step 1: Generate text and image prompt with retry
+      // Generate text with retry
       const postData = await invokeWithRetry<{
-        postText: string;
+        text: string;
         imagePrompt: string;
       }>("generate-post", {
         postType: data.postType,
@@ -49,29 +45,13 @@ const Index = () => {
         additionalInfo: data.additionalInfo,
       });
 
-      const { postText, imagePrompt } = postData;
-
-      // Update with generated text
-      setGeneratedText(postText);
+      setGeneratedText(postData.text);
       setIsGeneratingText(false);
       toast.success("ပို့စ် စာသား ထုတ်ပေးပြီးပါပြီ!");
-
-      // Step 2: Generate image using the prompt with retry
-      const imageData = await invokeWithRetry<{ imageUrl: string }>(
-        "generate-image",
-        { prompt: imagePrompt },
-        { maxRetries: 2, timeout: 90000 } // Longer timeout for images
-      );
-
-      setGeneratedImage(imageData.imageUrl);
-      setIsGeneratingImage(false);
-      toast.success("ပုံ ထုတ်ပေးပြီးပါပြီ!");
     } catch (error: any) {
       const errorMessage = handleApiError(error);
       toast.error(errorMessage);
-
       setIsGeneratingText(false);
-      setIsGeneratingImage(false);
     }
   };
 
@@ -139,7 +119,7 @@ const Index = () => {
             </h2>
             <PostGeneratorForm
               onSubmit={handleGenerate}
-              isLoading={isGeneratingText || isGeneratingImage}
+              isLoading={isGeneratingText}
             />
           </div>
 
@@ -147,9 +127,7 @@ const Index = () => {
           <div className="lg:min-h-screen">
             <GeneratedPost
               text={generatedText}
-              image={generatedImage}
               isGeneratingText={isGeneratingText}
-              isGeneratingImage={isGeneratingImage}
             />
           </div>
         </div>
