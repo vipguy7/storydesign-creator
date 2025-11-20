@@ -190,7 +190,7 @@ Make it authentic, engaging, and tailored for Myanmar K-pop fans!`;
         generationConfig: {
           responseMimeType: "application/json",
           temperature: 0.8,
-          maxOutputTokens: 1000,
+          maxOutputTokens: 4096,
         },
       }),
     });
@@ -234,7 +234,7 @@ Make it authentic, engaging, and tailored for Myanmar K-pop fans!`;
     
     const candidate = data.candidates[0];
     
-    // Check if content was blocked
+    // Check if content was blocked or truncated
     if (candidate.finishReason === 'SAFETY' || candidate.finishReason === 'RECITATION') {
       console.error("Content blocked due to:", candidate.finishReason);
       if (candidate.safetyRatings) {
@@ -243,10 +243,16 @@ Make it authentic, engaging, and tailored for Myanmar K-pop fans!`;
       throw new Error(`Content generation blocked due to ${candidate.finishReason}`);
     }
     
+    if (candidate.finishReason === 'MAX_TOKENS') {
+      console.error("Response truncated due to MAX_TOKENS. Consider increasing maxOutputTokens.");
+      throw new Error("Response was too long and was truncated. Please try with fewer products or a shorter request.");
+    }
+    
     const content = candidate.content?.parts?.[0]?.text;
     
     if (!content) {
       console.error("Failed to extract content. Candidate structure:", JSON.stringify(candidate, null, 2));
+      console.error("Finish reason:", candidate.finishReason);
       throw new Error("Failed to generate content from Google Gemini");
     }
     
