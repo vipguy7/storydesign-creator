@@ -220,9 +220,33 @@ Make it authentic, engaging, and tailored for Myanmar K-pop fans!`;
     }
 
     const data = await response.json();
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    console.log("Gemini API full response:", JSON.stringify(data, null, 2));
+    
+    // Check for safety blocks or other issues
+    if (!data.candidates || data.candidates.length === 0) {
+      console.error("No candidates in response. Full response:", JSON.stringify(data, null, 2));
+      if (data.promptFeedback) {
+        console.error("Prompt feedback:", JSON.stringify(data.promptFeedback, null, 2));
+        throw new Error(`Content generation blocked: ${data.promptFeedback.blockReason || 'Unknown reason'}`);
+      }
+      throw new Error("No candidates returned from Gemini API");
+    }
+    
+    const candidate = data.candidates[0];
+    
+    // Check if content was blocked
+    if (candidate.finishReason === 'SAFETY' || candidate.finishReason === 'RECITATION') {
+      console.error("Content blocked due to:", candidate.finishReason);
+      if (candidate.safetyRatings) {
+        console.error("Safety ratings:", JSON.stringify(candidate.safetyRatings, null, 2));
+      }
+      throw new Error(`Content generation blocked due to ${candidate.finishReason}`);
+    }
+    
+    const content = candidate.content?.parts?.[0]?.text;
     
     if (!content) {
+      console.error("Failed to extract content. Candidate structure:", JSON.stringify(candidate, null, 2));
       throw new Error("Failed to generate content from Google Gemini");
     }
     
