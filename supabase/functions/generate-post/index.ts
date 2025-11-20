@@ -170,9 +170,9 @@ ${additionalInfo ? `Additional context: ${additionalInfo}` : ""}
 
 Make it authentic, engaging, and tailored for Myanmar K-pop fans!`;
 
-    console.log("Using Google Gemini 3.0 Flash to generate post...");
+    console.log("Using Google Gemini 2.5 Flash to generate post...");
     
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -226,7 +226,7 @@ Make it authentic, engaging, and tailored for Myanmar K-pop fans!`;
       throw new Error("Failed to generate content from Google Gemini");
     }
     
-    console.log("Successfully generated post with Google Gemini 3.0 Flash");
+    console.log("Successfully generated post with Google Gemini 2.5 Flash");
 
     // Parse the JSON response from the AI
     let parsedContent;
@@ -245,8 +245,75 @@ Make it authentic, engaging, and tailored for Myanmar K-pop fans!`;
 
     console.log("Post generation successful");
 
+    // Generate image using Gemini 2.5 Flash Image (Nano banana)
+    console.log("Generating image with Gemini 2.5 Flash Image...");
+    
+    const imageResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${GEMINI_API_KEY}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                text: parsedContent.imagePrompt,
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.7,
+        },
+      }),
+    });
+
+    if (!imageResponse.ok) {
+      const errorText = await imageResponse.text();
+      console.error("Image generation error:", imageResponse.status, errorText);
+      // Return text without image if image generation fails
+      return new Response(
+        JSON.stringify({
+          text: parsedContent.text,
+          imagePrompt: parsedContent.imagePrompt,
+          error: "Image generation failed, returning text only"
+        }),
+        {
+          headers: { 
+            ...corsHeaders, 
+            "Content-Type": "application/json",
+            'X-RateLimit-Limit': RATE_LIMIT.toString(),
+            'X-RateLimit-Remaining': rateLimitResult.remainingRequests?.toString() || '0',
+            'X-RateLimit-Reset': Math.floor(rateLimitResult.resetTime! / 1000).toString()
+          },
+          status: 200,
+        }
+      );
+    }
+
+    const imageData = await imageResponse.json();
+    
+    // Extract the inline data from the response
+    const inlineData = imageData.candidates?.[0]?.content?.parts?.find(
+      (part: any) => part.inlineData
+    )?.inlineData;
+    
+    let imageUrl = null;
+    if (inlineData) {
+      // Convert base64 to data URL
+      imageUrl = `data:${inlineData.mimeType};base64,${inlineData.data}`;
+      console.log("Image generated successfully");
+    } else {
+      console.log("No image data in response");
+    }
+
     return new Response(
-      JSON.stringify(parsedContent),
+      JSON.stringify({
+        text: parsedContent.text,
+        imagePrompt: parsedContent.imagePrompt,
+        imageUrl: imageUrl
+      }),
       {
         headers: { 
           ...corsHeaders, 
