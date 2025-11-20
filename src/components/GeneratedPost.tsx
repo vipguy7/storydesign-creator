@@ -5,6 +5,7 @@ import { safeStorage } from "@/lib/storage";
 
 interface GeneratedPostProps {
   text: string | null;
+  imageUrl: string | null;
   isGeneratingText: boolean;
 }
 
@@ -16,6 +17,7 @@ interface SavedPost {
 
 export const GeneratedPost = ({
   text,
+  imageUrl,
   isGeneratingText,
 }: GeneratedPostProps) => {
   const handleCopyText = async () => {
@@ -179,8 +181,19 @@ export const GeneratedPost = ({
               </div>
             </div>
           ) : text ? (
-            <div className="prose prose-sm max-w-none whitespace-pre-wrap text-card-foreground text-sm sm:text-base leading-relaxed">
-              {text}
+            <div className="space-y-4">
+              <div className="prose prose-sm max-w-none whitespace-pre-wrap text-card-foreground text-sm sm:text-base leading-relaxed">
+                {text}
+              </div>
+              {imageUrl && (
+                <div className="mt-6 rounded-xl overflow-hidden border border-border shadow-lg">
+                  <img 
+                    src={imageUrl} 
+                    alt="Generated post image" 
+                    className="w-full h-auto"
+                  />
+                </div>
+              )}
             </div>
           ) : null}
         </div>

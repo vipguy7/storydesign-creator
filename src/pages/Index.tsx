@@ -12,6 +12,7 @@ import { invokeWithRetry, handleApiError } from "@/lib/apiClient";
 
 const Index = () => {
   const [generatedText, setGeneratedText] = useState<string | null>(null);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isGeneratingText, setIsGeneratingText] = useState(false);
   const [showLibrary, setShowLibrary] = useState(false);
 
@@ -31,6 +32,7 @@ const Index = () => {
 
     // Reset state
     setGeneratedText(null);
+    setGeneratedImage(null);
     setIsGeneratingText(true);
 
     try {
@@ -38,6 +40,7 @@ const Index = () => {
       const postData = await invokeWithRetry<{
         text: string;
         imagePrompt: string;
+        imageUrl?: string;
       }>("generate-post", {
         postType: data.postType,
         postTone: data.postTone,
@@ -46,6 +49,7 @@ const Index = () => {
       });
 
       setGeneratedText(postData.text);
+      setGeneratedImage(postData.imageUrl || null);
       setIsGeneratingText(false);
       toast.success("ပို့စ် စာသား ထုတ်ပေးပြီးပါပြီ!");
     } catch (error: any) {
@@ -125,10 +129,11 @@ const Index = () => {
 
           {/* Right Column - Generated Content */}
           <div className="lg:min-h-screen">
-            <GeneratedPost
-              text={generatedText}
-              isGeneratingText={isGeneratingText}
-            />
+              <GeneratedPost
+                text={generatedText}
+                imageUrl={generatedImage}
+                isGeneratingText={isGeneratingText}
+              />
           </div>
         </div>
       </main>
