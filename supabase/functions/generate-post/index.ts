@@ -112,10 +112,10 @@ serve(async (req) => {
     
     console.log("Generating post with:", { postType, postTone, products, additionalInfo });
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     
-    if (!LOVABLE_API_KEY) {
-      throw new Error("Lovable AI is not configured");
+    if (!GEMINI_API_KEY) {
+      throw new Error("Gemini API is not configured");
     }
 
     // Construct the detailed prompt for the AI
@@ -170,39 +170,46 @@ ${additionalInfo ? `Additional context: ${additionalInfo}` : ""}
 
 Make it authentic, engaging, and tailored for Myanmar K-pop fans!`;
 
-    console.log("Using Lovable AI to generate post...");
+    console.log("Using Google Gemini 3.0 Flash to generate post...");
     
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
+        contents: [
+          {
+            parts: [
+              {
+                text: `${systemPrompt}\n\n${userPrompt}`,
+              },
+            ],
+          },
         ],
-        response_format: { type: "json_object" }
+        generationConfig: {
+          responseMimeType: "application/json",
+          temperature: 0.8,
+          maxOutputTokens: 1000,
+        },
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Lovable AI error:", response.status, errorText);
+      console.error("Google Gemini API error:", response.status, errorText);
       
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ 
-            error: "AI usage limit reached. Please add credits to your Lovable workspace to continue." 
-          }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      } else if (response.status === 429) {
+      if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      } else if (response.status === 403) {
+        return new Response(
+          JSON.stringify({ 
+            error: "API key issue. Please check your Gemini API configuration." 
+          }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       } else {
         return new Response(
@@ -213,13 +220,13 @@ Make it authentic, engaging, and tailored for Myanmar K-pop fans!`;
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
     
     if (!content) {
-      throw new Error("Failed to generate content from Lovable AI");
+      throw new Error("Failed to generate content from Google Gemini");
     }
     
-    console.log("Successfully generated post with Lovable AI");
+    console.log("Successfully generated post with Google Gemini 3.0 Flash");
 
     // Parse the JSON response from the AI
     let parsedContent;
