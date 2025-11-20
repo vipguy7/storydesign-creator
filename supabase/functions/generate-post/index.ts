@@ -5,9 +5,69 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Simple in-memory rate limiter
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 10; // requests per window
+const RATE_WINDOW = 60 * 1000; // 1 minute in milliseconds
+
+function checkRateLimit(identifier: string): { allowed: boolean; remainingRequests?: number; resetTime?: number } {
+  const now = Date.now();
+  const record = rateLimitMap.get(identifier);
+
+  // Clean up expired entries periodically
+  if (rateLimitMap.size > 1000) {
+    for (const [key, value] of rateLimitMap.entries()) {
+      if (now > value.resetTime) {
+        rateLimitMap.delete(key);
+      }
+    }
+  }
+
+  if (!record || now > record.resetTime) {
+    // New window
+    rateLimitMap.set(identifier, { count: 1, resetTime: now + RATE_WINDOW });
+    return { allowed: true, remainingRequests: RATE_LIMIT - 1, resetTime: now + RATE_WINDOW };
+  }
+
+  if (record.count >= RATE_LIMIT) {
+    return { allowed: false, remainingRequests: 0, resetTime: record.resetTime };
+  }
+
+  // Increment count
+  record.count++;
+  rateLimitMap.set(identifier, record);
+  return { allowed: true, remainingRequests: RATE_LIMIT - record.count, resetTime: record.resetTime };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Rate limiting check
+  const clientIP = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
+  const rateLimitResult = checkRateLimit(clientIP);
+
+  if (!rateLimitResult.allowed) {
+    const retryAfter = Math.ceil((rateLimitResult.resetTime! - Date.now()) / 1000);
+    console.log(`Rate limit exceeded for IP: ${clientIP}`);
+    return new Response(
+      JSON.stringify({ 
+        error: "Too many requests. Please try again later.",
+        retryAfter: retryAfter
+      }),
+      { 
+        status: 429,
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json',
+          'Retry-After': retryAfter.toString(),
+          'X-RateLimit-Limit': RATE_LIMIT.toString(),
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': Math.floor(rateLimitResult.resetTime! / 1000).toString()
+        }
+      }
+    );
   }
 
   try {
@@ -181,7 +241,13 @@ Make it authentic, engaging, and tailored for Myanmar K-pop fans!`;
     return new Response(
       JSON.stringify(parsedContent),
       {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { 
+          ...corsHeaders, 
+          "Content-Type": "application/json",
+          'X-RateLimit-Limit': RATE_LIMIT.toString(),
+          'X-RateLimit-Remaining': rateLimitResult.remainingRequests?.toString() || '0',
+          'X-RateLimit-Reset': Math.floor(rateLimitResult.resetTime! / 1000).toString()
+        },
         status: 200,
       }
     );
