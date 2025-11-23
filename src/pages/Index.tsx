@@ -49,6 +49,7 @@ const Index = () => {
       const postData = await invokeWithRetry<{
         text: string;
         imagePrompt: string;
+        imageUrl?: string;
       }>(
         "generate-post",
         {
@@ -56,29 +57,22 @@ const Index = () => {
           postTone: data.postTone,
           products: data.products,
           additionalInfo: data.additionalInfo,
-        },
-        abortRef.current.signal
+        }
       );
 
       setGeneratedText(postData.text);
-      toast.success("📄 စာသား တစ်ခါတည်း ပြီးမြောက်ပါပြီ!");
-
-      // 2) NOW GENERATE IMAGE BASED ON THE PROMPT
       setIsGeneratingText(false);
-      setIsGeneratingImage(true);
-
-      const imageData = await invokeWithRetry<{ imageUrl: string }>(
-        "generate-image",
-        {
-          prompt: postData.imagePrompt,
-        },
-        abortRef.current.signal
-      );
-
-      setGeneratedImage(imageData.imageUrl);
-      toast.success("🖼️ ပုံဖန်တီးခြင်း ပြီးမြောက်ပါပြီ!");
-
-      setIsGeneratingImage(false);
+      
+      // Check if image was generated
+      if (postData.imageUrl) {
+        setGeneratedImage(postData.imageUrl);
+        toast.success("📄 စာသားနှင့် ပုံ ဖန်တီးပြီးပါပြီ!");
+      } else {
+        toast.success("📄 စာသား ဖန်တီးပြီးပါပြီ!");
+        if (postData.imagePrompt) {
+          toast.info("ပုံဖန်တီးခြင်း မအောင်မြင်ပါ (Quota ကျော်လွန်နေခြင်း)");
+        }
+      }
     } catch (error: any) {
       if (error.name === "AbortError") {
         toast.error("တောင်းဆိုမှုကို ရပ်ဆိုင်းလိုက်သည်");
