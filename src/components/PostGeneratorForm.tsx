@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PostType, PostTone, PRODUCTS } from "@/lib/constants";
+import { PostType, PostTone, ContentStyle, PRODUCTS } from "@/lib/constants";
 import { Sparkles, ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
@@ -15,6 +15,7 @@ interface PostGeneratorFormProps {
   onSubmit: (data: {
     postType: PostType;
     postTone: PostTone;
+    contentStyle: ContentStyle;
     products: string[];
     additionalInfo: string;
   }) => void;
@@ -24,6 +25,7 @@ interface PostGeneratorFormProps {
 export const PostGeneratorForm = ({ onSubmit, isLoading }: PostGeneratorFormProps) => {
   const [postType, setPostType] = useState<PostType>(PostType.PROMOTION);
   const [postTone, setPostTone] = useState<PostTone>(PostTone.FRIENDLY);
+  const [contentStyle, setContentStyle] = useState<ContentStyle>(ContentStyle.STORYTELLING);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [additionalInfo, setAdditionalInfo] = useState("");
 
@@ -37,7 +39,7 @@ export const PostGeneratorForm = ({ onSubmit, isLoading }: PostGeneratorFormProp
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ postType, postTone, products: selectedProducts, additionalInfo });
+    onSubmit({ postType, postTone, contentStyle, products: selectedProducts, additionalInfo });
   };
 
   const getProductDisplay = () => {
@@ -100,6 +102,35 @@ export const PostGeneratorForm = ({ onSubmit, isLoading }: PostGeneratorFormProp
                 }`}
               >
                 {tone}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <div className="space-y-2">
+        <Label className="text-sm sm:text-base font-semibold">✨ အကြောင်းအရာပုံစံ ရွေးချယ်ပါ</Label>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full justify-between text-left font-medium h-auto py-3 px-4"
+            >
+              <span className="truncate">{contentStyle}</span>
+              <ChevronDown className="h-4 w-4 ml-2 flex-shrink-0 opacity-50" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[300px] overflow-y-auto bg-background z-50">
+            {Object.values(ContentStyle).map((style) => (
+              <DropdownMenuItem
+                key={style}
+                onClick={() => setContentStyle(style)}
+                className={`cursor-pointer ${
+                  contentStyle === style ? "bg-accent text-accent-foreground" : ""
+                }`}
+              >
+                {style}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>

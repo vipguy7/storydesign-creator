@@ -1,7 +1,7 @@
 import { useState, useRef, Suspense, lazy } from "react";
 import { PostGeneratorForm } from "@/components/PostGeneratorForm";
 import { GeneratedPost } from "@/components/GeneratedPost";
-import { PostType, PostTone } from "@/lib/constants";
+import { PostType, PostTone, ContentStyle } from "@/lib/constants";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ const Index = () => {
   const handleGenerate = async (data: {
     postType: PostType;
     postTone: PostTone;
+    contentStyle: ContentStyle;
     products: string[];
     additionalInfo: string;
   }) => {
@@ -55,6 +56,7 @@ const Index = () => {
         {
           postType: data.postType,
           postTone: data.postTone,
+          contentStyle: data.contentStyle,
           products: data.products,
           additionalInfo: data.additionalInfo,
         }
