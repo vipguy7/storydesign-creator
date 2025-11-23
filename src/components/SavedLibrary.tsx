@@ -16,7 +16,7 @@ interface SavedLibraryProps {
   onClose: () => void;
 }
 
-export const SavedLibrary = ({ onClose }: SavedLibraryProps) => {
+const SavedLibrary = ({ onClose }: SavedLibraryProps) => {
   const [savedPosts, setSavedPosts] = useState<SavedPost[]>([]);
 
   useEffect(() => {
@@ -178,3 +178,5 @@ export const SavedLibrary = ({ onClose }: SavedLibraryProps) => {
     </div>
   );
 };
+
+export default SavedLibrary;
