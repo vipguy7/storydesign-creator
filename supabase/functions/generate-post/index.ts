@@ -72,7 +72,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { postType, postTone, products, additionalInfo } = body;
+    const { postType, postTone, contentStyle, products, additionalInfo } = body;
 
     // Input validation
     if (!postType || typeof postType !== 'string') {
@@ -110,7 +110,7 @@ serve(async (req) => {
       );
     }
     
-    console.log("Generating post with:", { postType, postTone, products, additionalInfo });
+    console.log("Generating post with:", { postType, postTone, contentStyle, products, additionalInfo });
 
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     
@@ -118,41 +118,41 @@ serve(async (req) => {
       throw new Error("Gemini API is not configured");
     }
 
-    // Create varied content styles
-    const contentStyles = [
-      {
+    // Map user-selected content style to instructions
+    const contentStyleMap: Record<string, { name: string; instruction: string }> = {
+      "Storytelling (ပုံပြင်ပုံစံ)": {
         name: "storytelling",
         instruction: `Tell a mini-story or scenario. Example: "ဒီနေ့ သူငယ်ချင်းတစ်ယောက် concert က ပုံတွေကို Photo Book လုပ်ပြီး သူ့ bias ကို လက်ဆောင်ပေးလိုက်တဲ့အကြောင်း ပြောပြမယ်..."`
       },
-      {
+      "Question Hook (မေးခွန်းပုံစံ)": {
         name: "question_hook",
         instruction: `Start with an engaging question. Example: "မင်းတို့ K-pop collection ကို သူတစ်ပါးနဲ့ မတူအောင် ဘယ်လို upgrade လုပ်မလဲ? 🤔"`
       },
-      {
+      "Bold Statement (တောင့်တင်းသော ပြောဆို)": {
         name: "bold_statement",
         instruction: `Open with a bold, provocative statement. Example: "ဖုန်းထဲမှာ ပုံထောင်ပေါင်းများစွာ သိမ်းထားတာက အချိန်ဖြုန်းတာပါ! 😱"`
       },
-      {
+      "Trending Moment (လက်ရှိခေတ်စားနေသော)": {
         name: "trending_moment",
         instruction: `Reference current K-pop trends or moments. Example: "Comeback season ရောက်ပြီ! တစ်ခါတည်း အမှတ်တရတွေ ပြန်စုမလား? 🎊"`
       },
-      {
+      "Emotional Appeal (စိတ်ခံစားမှု ထိတွေ့)": {
         name: "emotional_appeal",
         instruction: `Connect emotionally with deep fan feelings. Example: "Concert က အမှတ်တရတွေက အမြဲတမ်း အသက်ရှင်နေစေချင်တယ်မလား? 💜✨"`
       },
-      {
+      "Problem Solution (ပြဿနာ & အဖြေ)": {
         name: "problem_solution",
         instruction: `Present a problem then offer solution. Example: "ပုံတွေ သိန်း ၁၀၀ ကျော်နေပြီ၊ phone memory ပြည့်နေပြီ? 😫 အဖြေရှိတယ်..."`
       },
-      {
+      "FOMO Trigger (လက်လွတ်မခံချင်စိတ်)": {
         name: "fomo_trigger",
         instruction: `Create fear of missing out. Example: "မင်းသူငယ်ချင်းတွေ အားလုံး Photo Book လုပ်ပြီးပြီ... မင်းတစ်ယောက်တည်း နောက်ကျန်နေမှာလား? 😢"`
       },
-      {
+      "Exclusive Reveal (သီးသန့် ထုတ်ဖော်)": {
         name: "exclusive_reveal",
         instruction: `Tease exclusive or limited content. Example: "Secret ပြောပြမယ်... 🤫 Limited edition design အသစ်တွေ ထွက်လာမယ်..."`
       }
-    ];
+    };
 
     const visualStyles = [
       "vibrant K-pop aesthetic with bold colors and dramatic lighting",
@@ -165,8 +165,8 @@ serve(async (req) => {
       "cozy intimate flat-lay with warm natural lighting"
     ];
 
-    // Randomly select styles for variety
-    const selectedStyle = contentStyles[Math.floor(Math.random() * contentStyles.length)];
+    // Use user-selected style, fallback to random if not found
+    const selectedStyle = contentStyleMap[contentStyle] || contentStyleMap["Storytelling (ပုံပြင်ပုံစံ)"];
     const selectedVisual = visualStyles[Math.floor(Math.random() * visualStyles.length)];
 
     const emojiSets = [

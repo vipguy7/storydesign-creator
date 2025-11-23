@@ -22,6 +22,17 @@ export enum PostTone {
   LUXURIOUS = "Luxurious & Premium",
 }
 
+export enum ContentStyle {
+  STORYTELLING = "Storytelling (ပုံပြင်ပုံစံ)",
+  QUESTION_HOOK = "Question Hook (မေးခွန်းပုံစံ)",
+  BOLD_STATEMENT = "Bold Statement (တောင့်တင်းသော ပြောဆို)",
+  TRENDING_MOMENT = "Trending Moment (လက်ရှိခေတ်စားနေသော)",
+  EMOTIONAL_APPEAL = "Emotional Appeal (စိတ်ခံစားမှု ထိတွေ့)",
+  PROBLEM_SOLUTION = "Problem Solution (ပြဿနာ & အဖြေ)",
+  FOMO_TRIGGER = "FOMO Trigger (လက်လွတ်မခံချင်စိတ်)",
+  EXCLUSIVE_REVEAL = "Exclusive Reveal (သီးသန့် ထုတ်ဖော်)",
+}
+
 export const PRODUCTS = [
   // Photo Printing Services
   {
