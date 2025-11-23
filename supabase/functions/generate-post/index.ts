@@ -118,33 +118,121 @@ serve(async (req) => {
       throw new Error("Gemini API is not configured");
     }
 
-    // Construct a concise prompt for the AI
-    const systemPrompt = `You are a social media expert for Story Design (facebook.com/storydesignmm), a Myanmar printing & design business.
+    // Create varied content styles
+    const contentStyles = [
+      {
+        name: "storytelling",
+        instruction: `Tell a mini-story or scenario. Example: "ဒီနေ့ သူငယ်ချင်းတစ်ယောက် concert က ပုံတွေကို Photo Book လုပ်ပြီး သူ့ bias ကို လက်ဆောင်ပေးလိုက်တဲ့အကြောင်း ပြောပြမယ်..."`
+      },
+      {
+        name: "question_hook",
+        instruction: `Start with an engaging question. Example: "မင်းတို့ K-pop collection ကို သူတစ်ပါးနဲ့ မတူအောင် ဘယ်လို upgrade လုပ်မလဲ? 🤔"`
+      },
+      {
+        name: "bold_statement",
+        instruction: `Open with a bold, provocative statement. Example: "ဖုန်းထဲမှာ ပုံထောင်ပေါင်းများစွာ သိမ်းထားတာက အချိန်ဖြုန်းတာပါ! 😱"`
+      },
+      {
+        name: "trending_moment",
+        instruction: `Reference current K-pop trends or moments. Example: "Comeback season ရောက်ပြီ! တစ်ခါတည်း အမှတ်တရတွေ ပြန်စုမလား? 🎊"`
+      },
+      {
+        name: "emotional_appeal",
+        instruction: `Connect emotionally with deep fan feelings. Example: "Concert က အမှတ်တရတွေက အမြဲတမ်း အသက်ရှင်နေစေချင်တယ်မလား? 💜✨"`
+      },
+      {
+        name: "problem_solution",
+        instruction: `Present a problem then offer solution. Example: "ပုံတွေ သိန်း ၁၀၀ ကျော်နေပြီ၊ phone memory ပြည့်နေပြီ? 😫 အဖြေရှိတယ်..."`
+      },
+      {
+        name: "fomo_trigger",
+        instruction: `Create fear of missing out. Example: "မင်းသူငယ်ချင်းတွေ အားလုံး Photo Book လုပ်ပြီးပြီ... မင်းတစ်ယောက်တည်း နောက်ကျန်နေမှာလား? 😢"`
+      },
+      {
+        name: "exclusive_reveal",
+        instruction: `Tease exclusive or limited content. Example: "Secret ပြောပြမယ်... 🤫 Limited edition design အသစ်တွေ ထွက်လာမယ်..."`
+      }
+    ];
 
-TARGET: K-pop fans 15-30 & small businesses
+    const visualStyles = [
+      "vibrant K-pop aesthetic with bold colors and dramatic lighting",
+      "soft pastel dreamy atmosphere with gentle bokeh effects",
+      "modern minimalist with clean lines and negative space",
+      "maximalist collage style with overlapping elements",
+      "retro vintage K-pop poster aesthetic with film grain",
+      "futuristic neon-lit cyberpunk K-pop concept",
+      "editorial magazine spread layout with high fashion feel",
+      "cozy intimate flat-lay with warm natural lighting"
+    ];
+
+    // Randomly select styles for variety
+    const selectedStyle = contentStyles[Math.floor(Math.random() * contentStyles.length)];
+    const selectedVisual = visualStyles[Math.floor(Math.random() * visualStyles.length)];
+
+    const emojiSets = [
+      ["✨", "💜", "🎁", "📸"],
+      ["🌟", "💝", "🎨", "🎉"],
+      ["💖", "🌸", "📚", "⭐"],
+      ["🔥", "💫", "🎊", "🎀"],
+      ["💕", "🌈", "📷", "✨"],
+      ["🦋", "💎", "🌺", "🎵"]
+    ];
+    const selectedEmojis = emojiSets[Math.floor(Math.random() * emojiSets.length)];
+
+    const ctaVariations = [
+      "DM လေးလာခဲ့ပါ!",
+      "Inbox မှာ မက်ဆေ့ခ်ျပို့လိုက်ပါ!",
+      "Comment 'interested' လို့ဆိုရင် ပြန်ပြောပေးမယ်!",
+      "Link ကို နှိပ်ပြီး မှာယူလိုက်ပါ!",
+      "အမြန်ဆုံး မက်ဆေ့ခ်ျပို့လိုက်ပါ - Limited slots သာ!",
+      "Tag your bias ထားပြီး DM လာပါ!",
+      "သူငယ်ချင်းတွေကို share လုပ်ပြီး အတူတူ မှာလိုက်ကြရအောင်!",
+      "Story မှာ mention လုပ်ပြီး special discount ယူလိုက်ပါ!"
+    ];
+    const selectedCTA = ctaVariations[Math.floor(Math.random() * ctaVariations.length)];
+
+    const systemPrompt = `You are a creative social media expert for Story Design (facebook.com/storydesignmm).
+
+TARGET: K-pop fans 15-30 & Myanmar small businesses
 PRODUCTS: Photo Books, Calendars, Prints, Pins, Fans, Keychains, Notebooks, Photocards, Logo/Ad Design
 
-STYLE:
-- Write 100% in Myanmar/Burmese (မြန်မာဘာသာ only)
-- Mix English naturally: "super special ဖြစ်တယ်", "customize လုပ်လို့ရတယ်"
-- Use conversational tone: "မင်း", "ရှင့်", "သူငယ်ချင်း"
-- Add emotional hooks: "ရင်ခုန်သွားတာပဲ", "မပျက်သင့်ဘူး"
-- Create urgency: "လက်ကျန်နည်းနေပြီ", "ဒီအပတ်သာ"
-- Include 3-4 emojis: ✨💜🎁📸🌟💝
-- End with CTA: "Inbox မှာ မက်ဆေ့ခ်ျပို့လိုက်ပါ" or "DM လေးလာခဲ့ပါ"
+CONTENT STYLE FOR THIS POST: "${selectedStyle.name}"
+${selectedStyle.instruction}
 
-HASHTAGS: #Myanmar #Yangon #KpopMyanmar #StoryDesign #PrintingService
+WRITING RULES:
+- Write 100% in Myanmar/Burmese (မြန်မာဘာသာ)
+- Mix English terms naturally: "customize", "limited edition", "premium quality"
+- Vary sentence length: short punchy lines + longer descriptive ones
+- Use these emojis naturally: ${selectedEmojis.join(" ")}
+- Be conversational: "မင်း", "ရှင့်", "သူငယ်ချင်း", "ညီမလေး"
+- Create FOMO and urgency differently each time
+- End with: "${selectedCTA}"
+
+IMPORTANT - VARY YOUR APPROACH:
+- Don't always list features - sometimes tell stories
+- Don't always be promotional - sometimes be helpful or entertaining
+- Mix up structure: questions, statements, scenarios, reveals
+- Vary length: some short and punchy, some detailed and descriptive
+
+HASHTAGS: Include 3-5 relevant tags from: #Myanmar #Yangon #KpopMyanmar #StoryDesign #PrintingService #Mandalay #KpopLife #BiasBirthday
+
+IMAGE STYLE: ${selectedVisual}
 
 Return JSON:
 {
-  "text": "Full Myanmar post with hashtags",
-  "imagePrompt": "Detailed English description for modern K-pop aesthetic image"
+  "text": "Creative varied Myanmar post with hashtags",
+  "imagePrompt": "Detailed English prompt using the assigned visual style"
 }`;
 
-    const userPrompt = `Create a ${postType} post with a ${postTone} tone for these products: ${products.join(", ")}.
-${additionalInfo ? `Additional context: ${additionalInfo}` : ""}
+    const userPrompt = `Create a ${postType} post with a ${postTone} tone for: ${products.join(", ")}.
+${additionalInfo ? `Context: ${additionalInfo}` : ""}
 
-Make it authentic, engaging, and tailored for Myanmar K-pop fans!`;
+CRITICAL: Make this POST COMPLETELY DIFFERENT from typical social media posts:
+- Use the assigned content style creatively
+- Don't follow predictable patterns
+- Make it memorable and shareable
+- Match the visual style in your writing tone
+- Surprise the reader!`;
 
     console.log("Using Google Gemini 2.5 Flash to generate post...");
     
@@ -165,7 +253,9 @@ Make it authentic, engaging, and tailored for Myanmar K-pop fans!`;
         ],
         generationConfig: {
           responseMimeType: "application/json",
-          temperature: 0.8,
+          temperature: 1.2, // Higher temperature for more creativity and variety
+          topP: 0.95,
+          topK: 40,
           maxOutputTokens: 4096,
         },
       }),
