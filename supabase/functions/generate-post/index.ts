@@ -256,7 +256,7 @@ CRITICAL: Make this POST COMPLETELY DIFFERENT from typical social media posts:
           temperature: 1.2, // Higher temperature for more creativity and variety
           topP: 0.95,
           topK: 40,
-          maxOutputTokens: 4096,
+          maxOutputTokens: 8192, // Increased to accommodate thoughts + content
         },
       }),
     });
