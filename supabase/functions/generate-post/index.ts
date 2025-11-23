@@ -218,10 +218,10 @@ HASHTAGS: Include 3-5 relevant tags from: #Myanmar #Yangon #KpopMyanmar #StoryDe
 
 IMAGE STYLE: ${selectedVisual}
 
-Return JSON:
+Return EXACTLY ONE post as JSON (not an array):
 {
-  "text": "Creative varied Myanmar post with hashtags",
-  "imagePrompt": "Detailed English prompt using the assigned visual style"
+  "text": "Creative Myanmar post with hashtags",
+  "imagePrompt": "Detailed English prompt using the visual style"
 }`;
 
     const userPrompt = `Create a ${postType} post with a ${postTone} tone for: ${products.join(", ")}.
@@ -328,15 +328,26 @@ CRITICAL: Make this POST COMPLETELY DIFFERENT from typical social media posts:
     let parsedContent;
     try {
       parsedContent = JSON.parse(content);
+      
+      // Handle if AI returns an array instead of single object
+      if (Array.isArray(parsedContent)) {
+        console.log("AI returned array, taking first element");
+        parsedContent = parsedContent[0];
+      }
     } catch (e) {
       console.error("Failed to parse AI response:", content);
       throw new Error("Invalid response format from AI");
     }
 
     // Validate the response structure
+    if (!parsedContent || typeof parsedContent !== 'object') {
+      console.error("Invalid AI response - not an object:", parsedContent);
+      throw new Error("AI response is not a valid object");
+    }
+    
     if (!parsedContent.text || !parsedContent.imagePrompt) {
       console.error("Invalid AI response structure:", parsedContent);
-      throw new Error("AI response missing required fields");
+      throw new Error("AI response missing required fields (text or imagePrompt)");
     }
 
     console.log("Post generation successful");
